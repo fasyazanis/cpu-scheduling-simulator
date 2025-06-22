@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulator Algoritma Penjadwalan CPU</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+            background-image: url('https://img.freepik.com/free-vector/hand-painted-watercolor-pastel-sky-background_23-2148902771.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #3498db;
+            margin-top: 30px;
+            border-left: 5px solid #3498db;
+            padding-left: 10px;
+        }
+        .algorithm {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .example {
+            background-color: #e8f4fc;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .advantages, .disadvantages {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .advantages {
+            background-color: #e8f8e8;
+            border-left: 4px solid #2ecc71;
+        }
+        .disadvantages {
+            background-color: #fae8e8;
+            border-left: 4px solid #e74c3c;
+        }
+        .input-section {
+            background-color: #fffde7;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border-left: 4px solid #ffc107;
+        }
+        .output-section {
+            background-color: #e8f5e9;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border-left: 4px solid #4caf50;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px 0;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        input, select {
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .process-input {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .gantt-chart {
+            display: flex;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+        .gantt-box {
+            min-width: 60px;
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #333;
+            background-color: #e3f2fd;
+            margin-right: 2px;
+        }
+        .time-marker {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+        }
+        .metrics {
+            margin-top: 15px;
+        }
+        .team-section {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #333;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 30px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+        .team-section::before {
+            content: "";
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 150px;
+            height: 150px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+        }
+        .team-section::after {
+            content: "";
+            position: absolute;
+            bottom: -30px;
+            left: -30px;
+            width: 100px;
+            height: 100px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+        }
+        .team-title {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+            position: relative;
+            z-index: 1;
+        }
+        .team-members {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        .team-member {
+            background-color: rgba(255,255,255,0.8);
+            color: #333;
+            padding: 15px;
+            border-radius: 8px;
+            width: 200px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        .team-member:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .member-id {
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 5px;
+        }
+        .member-name {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Simulator Algoritma Penjadwalan CPU</h1>
+        
+        <div class="team-section">
+            <div class="team-title">Kelompok Sistem Operasi Lanjut</div>
+            <div class="team-members">
+                <div class="team-member">
+                    <div class="member-id">11240041</div>
+                    <div class="member-name">Fasyaharani Firdausyinia Zanis</div>
+                </div>
+                <div class="team-member">
+                    <div class="member-id">11240051</div>
+                    <div class="member-name">Fitri Marlina</div>
+                </div>
+                <div class="team-member">
+                    <div class="member-id">11240057</div>
+                    <div class="member-name">Salwa Nabila</div>
+                </div>
+                <div class="team-member">
+                    <div class="member-id">11240062</div>
+                    <div class="member-name">Ani Rahmawati</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="input-section">
+            <h2>Input Proses</h2>
+            <div id="process-inputs">
+                <div class="process-input">
+                    <span>Proses 1:</span>
+                    <input type="number" id="arrival1" placeholder="Waktu kedatangan" min="0" value="0">
+                    <input type="number" id="burst1" placeholder="CPU Time" min="1" value="10">
+                    <button onclick="removeProcess(1)">Hapus</button>
+                </div>
+                <div class="process-input">
+                    <span>Proses 2:</span>
+                    <input type="number" id="arrival2" placeholder="Waktu kedatangan" min="0" value="1">
+                    <input type="number" id="burst2" placeholder="CPU Time" min="1" value="5">
+                    <button onclick="removeProcess(2)">Hapus</button>
+                </div>
+                <div class="process-input">
+                    <span>Proses 3:</span>
+                    <input type="number" id="arrival3" placeholder="Waktu kedatangan" min="0" value="2">
+                    <input type="number" id="burst3" placeholder="CPU Time" min="1" value="8">
+                    <button onclick="removeProcess(3)">Hapus</button>
+                </div>
+            </div>
+            <button onclick="addProcess()">Tambah Proses</button>
+            
+            <div style="margin-top: 20px;">
+                <label for="algorithm">Pilih Algoritma:</label>
+                <select id="algorithm">
+                    <option value="fifo">FIFO (First In First Out)</option>
+                    <option value="lifo">LIFO (Last In First Out)</option>
+                    <option value="rr">Round Robin</option>
+                    <option value="sjf">SJF (Shortest Job First)</option>
+                    <option value="sjf-p">SRF (Shortest Remaining First)</option>
+                </select>
+                
+                <div id="quantum-container" style="display: none; margin-top: 10px;">
+                    <label for="quantum">Time Quantum:</label>
+                    <input type="number" id="quantum" min="1" value="4">
+                </div>
+            </div>
+            
+            <button onclick="simulate()" style="margin-top: 20px;">Simulasikan</button>
+        </div>
+        
+        <div class="output-section" id="output" style="display: none;">
+            <h2>Hasil Simulasi</h2>
+            <div id="algorithm-name"></div>
+            
+            <h3>Gantt Chart</h3>
+            <div id="gantt-chart" class="gantt-chart"></div>
+            
+            <h3>Tabel Proses</h3>
+            <table id="process-table">
+                <thead>
+                    <tr>
+                        <th>Proses</th>
+                        <th>Waktu Kedatangan</th>
+                        <th>CPU Time</th>
+                        <th>Waktu Selesai</th>
+                        <th>Turnaround Time</th>
+                        <th>Waktu Tunggu</th>
+                    </tr>
+                </thead>
+                <tbody id="process-table-body"></tbody>
+            </table>
+            
+            <div class="metrics" id="metrics"></div>
+        </div>
+        
+        <div class="algorithm">
+            <h2>1. FIFO (First In First Out)</h2>
+            <p>Juga dikenal sebagai FCFS (First Come First Serve), algoritma ini mengeksekusi proses berdasarkan urutan kedatangan.</p>
+            
+            <h3>Karakteristik:</h3>
+            <ul>
+                <li>Proses yang datang pertama akan dilayani pertama</li>
+                <li>Non-preemptive (tidak bisa diinterupsi)</li>
+                <li>Sederhana dan mudah diimplementasikan</li>
+            </ul>
+            
+            <div class="example">
+                <h3>Contoh Input:</h3>
+                <table>
+                    <tr>
+                        <th>Proses</th>
+                        <th>Waktu Kedatangan</th>
+                        <th>CPU Time</th>
+                    </tr>
+                    <tr>
+                        <td>P1</td>
+                        <td>0</td>
+                        <td>10</td>
+                    </tr>
+                    <tr>
+                        <td>P2</td>
+                        <td>1</td>
+                        <td>5</td>
+                    </tr>
+                    <tr>
+                        <td>P3</td>
+                        <td>2</td>
+                        <td>8</td>
+                    </tr>
+                </table>
+                
+                <h3>Contoh Output:</h3>
+                <p>Urutan eksekusi: P1 → P2 → P3</p>
+                <table>
+                    <tr>
+                        <th>Proses</th>
+                        <th>Waktu Tunggu</th>
+                        <th>Turnaround Time</th>
+                    </tr>
+                    <tr>
+                        <td>P1</td>
+                        <td>0</td>
+                        <td>10</td>
+                    </tr>
+                    <tr>
+                        <td>P2</td>
+                        <td>9</td>
+                        <td>14</td>
+                    </tr>
+                    <tr>
+                        <td>P3</td>
+                        <td>13</td>
+                        <td>21</td>
+                    </tr>
+                </table>
+                <p>Rata-rata Waktu Tunggu: 7.33</p>
+                <p>Rata-rata Turnaround Time: 15.00</p>
+            </div>
+        </div>
+        
+        <div class="algorithm">
+            <h2>2. LIFO (Last In First Out)</h2>
+            <p>Kebalikan dari FIFO, proses yang datang terakhir akan dilayani pertama.</p>
+            
+            <h3>Karakteristik:</h3>
+            <ul>
+                <li>Proses yang datang terakhir dilayani pertama</li>
+                <li>Non-preemptive</li>
+                <li>Mirip dengan struktur data stack</li>
+            </ul>
+            
+            <div class="example">
+                <h3>Contoh Input:</h3>
+                <table>
+                    <tr>
+                        <th>Proses</th>
+                        <th>Waktu Kedatangan</th>
+                        <th>CPU Time</th>
+                    </tr>
+                    <tr>
+                        <td>P1</td>
+                        <td>0</td>
+                        <td>10</td>
+                    </tr>
+                    <tr>
+                        <td>P2</td>
+                        <td>1</td>
+                        <td>5</td>
+                    </tr>
+                    <tr>
+                        <td>P3</td>
+                        <td>2</td>
+                        <td>8</td>
+                    </tr>
+                </table>
+                
+                <h3>Contoh Output:</h3>
+                <p>Urutan eksekusi: P3 → P2 → P1</p>
+                <table>
+                    <tr>
+                        <th>Proses</th>
+                        <th>Waktu Tunggu</th>
+                        <th>Turnaround Time</th>
+                    </tr>
+                    <tr>
+                        <td>P1</td>
+                        <td>13</td>
+                        <td>23</td>
+                    </tr>
+                    <tr>
+                        <td>P2</td>
+                        <td>8</td>
+                        <td>13</td>
+                    </tr>
+                    <tr>
+                        <td>P3</td>
+                        <td>0</td>
+                        <td>8</td>
+                    </tr>
+                </table>
+                <p>Rata-rata Waktu Tunggu: 7.00</p>
+                <p>Rata-rata Turnaround Time: 14.67</p>
+            </div>
+        </div>
+        
+        <div class="algorithm">
+            <h2>3. Round Robin (RR)</h2>
+            <p>Algoritma preemptive yang memberikan slot waktu (time quantum) yang sama untuk setiap proses secara bergiliran.</p>
+            
+            <h3>Karakteristik:</h3>
+            <ul>
+                <li>Setiap proses mendapatkan time quantum yang sama</li>
+                <li>Jika proses belum selesai, akan dikembalikan ke antrian ready</li>
+                <li>Cocok untuk sistem time-sharing</li>
+            </ul>
+            
+            <div class="example">
+                <h3>Contoh Input (Quantum = 4):</h3>
+                <table>
+                    <tr>
+                        <th>Proses</th>
+                        <th>Waktu Kedatangan</th>
+                        <th>CPU Time</th>
+                    </tr>
+                    <tr>
+                        <td>P1</td>
+                        <td>0</td>
+                        <td>10</td>
+                    </tr>
+                    <tr>
+                        <td>P2</td>
+                        <td>1</td>
+                        <td>5</td>
+                    </tr>
+                    <tr>
+                        <td>P3</td>
+                        <td>2</td>
+                        <td>8</td>
+                    </tr>
+                </table>
+                
+                <h3>Contoh Output:</h3>
+                <p>Urutan eksekusi: P1(4) → P2(4) → P3(4) → P1(4) → P2(1) → P3(4) → P1(2)</p>
+                <table>
+                    <tr>
+                        <th>Proses</th>
+                        <th>Waktu Tunggu</th>
+                        <th>Turnaround Time</th>
+                    </tr>
+                    <tr>
+                        <td>P1</td>
+                        <td>13</td>
+                        <td>23</td>
+                    </tr>
+                    <tr>
+                        <td>P2</td>
+                        <td>3</td>
+                        <td>8</td>
+                    </tr>
+                    <tr>
+                        <td>P3</td>
+                        <td>9</td>
+                        <td>17</td>
+                    </tr>
+                </table>
+                <p>Rata-rata Waktu Tunggu: 8.33</p>
+                <p>Rata-rata Turnaround Time: 16.00</p>
+            </div>
+        </div>
+        
+        <div class="algorithm">
+            <h2>4. SJF (Shortest Job First)</h2>
+            <p>Algoritma yang memprioritaskan proses dengan CPU Time terpendek.</p>
+            
+            <h3>Karakteristik:</h3>
+            <ul>
+                <li>Proses dengan CPU Time terpendek dilayani lebih dulu</li>
+                <li>Bisa preemptive (SRF) atau non-preemptive (SJF Non-preemptive)</li>
+                <li>Versi preemptive disebut juga Shortest Remaining Time First (SRTF)</li>
+            </ul>
+            
+            <div class="example">
+                <h3>Contoh Input:</h3>
+                <table>
+                    <tr>
+                        <th>Proses</th>
+                        <th>Waktu Kedatangan</th>
+                        <th>CPU Time</th>
+                    </tr>
+                    <tr>
+                        <td>P1</td>
+                        <td>0</td>
+                        <td>10</td>
+                    </tr>
+                    <tr>
+                        <td>P2</td>
+                        <td>1</td>
+                        <td>5</td>
+                    </tr>
+                    <tr>
+                        <td>P3</td>
+                        <td>2</td>
+                        <td>8</td>
+                    </tr>
+                </table>
+                
+                <h3>Contoh Output (Non-preemptive):</h3>
+                <p>Urutan eksekusi: P1(1) → P2(5) → P3(8) → P1(9)</p>
+                <table>
+                    <tr>
+                        <th>Proses</th>
+                        <th>Waktu Tunggu</th>
+                        <th>Turnaround Time</th>
+                    </tr>
+                    <tr>
+                        <td>P1</td>
+                        <td>0</td>
+                        <td>10</td>
+                    </tr>
+                    <tr>
+                        <td>P2</td>
+                        <td>0</td>
+                        <td>5</td>
+                    </tr>
+                    <tr>
+                        <td>P3</td>
+                        <td>5</td>
+                        <td>13</td>
+                    </tr>
+                </table>
+                <p>Rata-rata Waktu Tunggu: 1.67</p>
+                <p>Rata-rata Turnaround Time: 9.33</p>
+                
+                <h3>Contoh Output (Preemptive/SRF):</h3>
+                <p>Urutan eksekusi: P1(1) → P2(5) → P3(8) → P1(10)</p>
+                <table>
+                    <tr>
+                        <th>Proses</th>
+                        <th>Waktu Tunggu</th>
+                        <th>Turnaround Time</th>
+                    </tr>
+                    <tr>
+                        <td>P1</td>
+                        <td>5</td>
+                        <td>15</td>
+                    </tr>
+                    <tr>
+                        <td>P2</td>
+                        <td>0</td>
+                        <td>5</td>
+                    </tr>
+                    <tr>
+                        <td>P3</td>
+                        <td>1</td>
+                        <td>9</td>
+                    </tr>
+                </table>
+                <p>Rata-rata Waktu Tunggu: 2.00</p>
+                <p>Rata-rata Turnaround Time: 9.67</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let processCount = 3;
+        
+        function addProcess() {
+            processCount++;
+            const newProcess = document.createElement('div');
+            newProcess.className = 'process-input';
+            newProcess.innerHTML = `
+                <span>Proses ${processCount}:</span>
+                <input type="number" id="arrival${processCount}" placeholder="Waktu kedatangan" min="0" value="${processCount-1}">
+                <input type="number" id="burst${processCount}" placeholder="CPU Time" min="1" value="${Math.floor(Math.random() * 10) + 1}">
+                <button onclick="removeProcess(${processCount})">Hapus</button>
+            `;
+            document.getElementById('process-inputs').appendChild(newProcess);
+        }
+        
+        function removeProcess(id) {
+            if (processCount <= 1) {
+                alert("Minimal harus ada 1 proses");
+                return;
+            }
+            
+            const element = document.querySelector(`.process-input span:contains("Proses ${id}")`).parentNode;
+            element.remove();
+            
+            // Renumber remaining processes
+            const inputs = document.getElementById('process-inputs').children;
+            let newId = 1;
+            for (let i = 0; i < inputs.length; i++) {
+                const span = inputs[i].querySelector('span');
+                span.textContent = `Proses ${newId}:`;
+                
+                const inputsInDiv = inputs[i].querySelectorAll('input');
+                inputsInDiv[0].id = `arrival${newId}`;
+                inputsInDiv[1].id = `burst${newId}`;
+                
+                const button = inputs[i].querySelector('button');
+                button.setAttribute('onclick', `removeProcess(${newId})`);
+                
+                newId++;
+            }
+            processCount = newId - 1;
+        }
+        
+        document.getElementById('algorithm').addEventListener('change', function() {
+            const quantumContainer = document.getElementById('quantum-container');
+            if (this.value === 'rr') {
+                quantumContainer.style.display = 'block';
+            } else {
+                quantumContainer.style.display = 'none';
+            }
+        });
+        
+        function simulate() {
+            // Get selected algorithm
+            const algorithm = document.getElementById('algorithm').value;
+            const quantum = algorithm === 'rr' ? parseInt(document.getElementById('quantum').value) : 0;
+            
+            // Get process data
+            const processes = [];
+            for (let i = 1; i <= processCount; i++) {
+                const arrival = parseInt(document.getElementById(`arrival${i}`).value) || 0;
+                const burst = parseInt(document.getElementById(`burst${i}`).value) || 1;
+                processes.push({
+                    id: i,
+                    arrivalTime: arrival,
+                    burstTime: burst,
+                    remainingTime: burst,
+                    finishTime: 0,
+                    waitingTime: 0,
+                    turnaroundTime: 0
+                });
+            }
+            
+            // Run scheduling algorithm
+            let timeline = [];
+            switch(algorithm) {
+                case 'fifo':
+                    timeline = runFIFO([...processes]);
+                    break;
+                case 'lifo':
+                    timeline = runLIFO([...processes]);
+                    break;
+                case 'rr':
+                    timeline = runRoundRobin([...processes], quantum);
+                    break;
+                case 'sjf':
+                    timeline = runSJF([...processes], false);
+                    break;
+                case 'sjf-p':
+                    timeline = runSJF([...processes], true);
+                    break;
+            }
+            
+            // Calculate metrics
+            calculateMetrics(processes, timeline);
+            
+            // Display results
+            displayResults(processes, timeline, algorithm, quantum);
+        }
+        
+        function runFIFO(processes) {
+            // Sort by arrival time
+            processes.sort((a, b) => a.arrivalTime - b.arrivalTime);
+            
+            let timeline = [];
+            let currentTime = 0;
+            
+            for (let process of processes) {
+                // Wait if process hasn't arrived yet
+                if (currentTime < process.arrivalTime) {
+                    currentTime = process.arrivalTime;
+                }
+                
+                // Execute process
+                timeline.push({
+                    process: process.id,
+                    start: currentTime,
+                    end: currentTime + process.burstTime
+                });
+                
+                currentTime += process.burstTime;
+                process.finishTime = currentTime;
+            }
+            
+            return timeline;
+        }
+        
+        function runLIFO(processes) {
+            // Sort by arrival time in reverse
+            processes.sort((a, b) => b.arrivalTime - a.arrivalTime);
+            
+            let timeline = [];
+            let currentTime = 0;
+            
+            for (let process of processes) {
+                // Wait if process hasn't arrived yet
+                if (currentTime < process.arrivalTime) {
+                    currentTime = process.arrivalTime;
+                }
+                
+                // Execute process
+                timeline.push({
+                    process: process.id,
+                    start: currentTime,
+                    end: currentTime + process.burstTime
+                });
+                
+                currentTime += process.burstTime;
+                process.finishTime = currentTime;
+            }
+            
+            return timeline;
+        }
+        
+        function runRoundRobin(processes, quantum) {
+            let timeline = [];
+            let queue = [];
+            let currentTime = 0;
+            let remainingProcesses = processes.length;
+            
+            // Sort by arrival time
+            processes.sort((a, b) => a.arrivalTime - b.arrivalTime);
+            
+            // Create a copy of processes to work with
+            let processList = processes.map(p => ({...p}));
+            
+            // Initialize queue with processes that have arrived at time 0
+            for (let i = 0; i < processList.length; i++) {
+                if (processList[i].arrivalTime <= currentTime) {
+                    queue.push(processList[i]);
+                }
+            }
+            
+            while (remainingProcesses > 0) {
+                if (queue.length === 0) {
+                    // No processes ready, advance time to next arrival
+                    const nextArrival = processList
+                        .filter(p => p.remainingTime > 0)
+                        .reduce((min, p) => Math.min(min, p.arrivalTime), Infinity);
+                    
+                    if (nextArrival === Infinity) break;
+                    
+                    currentTime = nextArrival;
+                    
+                    // Add all processes that have arrived by this time
+                    for (let i = 0; i < processList.length; i++) {
+                        if (processList[i].arrivalTime <= currentTime && 
+                            processList[i].remainingTime > 0 && 
+                            !queue.includes(processList[i])) {
+                            queue.push(processList[i]);
+                        }
+                    }
+                    continue;
+                }
+                
+                const currentProcess = queue.shift();
+                const executionTime = Math.min(quantum, currentProcess.remainingTime);
+                
+                // Record execution in timeline
+                timeline.push({
+                    process: currentProcess.id,
+                    start: currentTime,
+                    end: currentTime + executionTime
+                });
+                
+                currentTime += executionTime;
+                currentProcess.remainingTime -= executionTime;
+                
+                // Add processes that arrived during this execution
+                for (let i = 0; i < processList.length; i++) {
+                    if (processList[i].arrivalTime <= currentTime && 
+                        processList[i].remainingTime > 0 && 
+                        !queue.includes(processList[i]) && 
+                        processList[i] !== currentProcess) {
+                        queue.push(processList[i]);
+                    }
+                }
+                
+                // If process not finished, add back to queue
+                if (currentProcess.remainingTime > 0) {
+                    queue.push(currentProcess);
+                } else {
+                    currentProcess.finishTime = currentTime;
+                    remainingProcesses--;
+                }
+            }
+            
+            return timeline;
+        }
+        
+        function runSJF(processes, preemptive) {
+            let timeline = [];
+            let currentTime = 0;
+            let remainingProcesses = processes.length;
+            
+            // Create a copy of processes to work with
+            let processList = processes.map(p => ({...p}));
+            
+            while (remainingProcesses > 0) {
+                // Get arrived processes with remaining time
+                let available = processList.filter(p => 
+                    p.arrivalTime <= currentTime && p.remainingTime > 0);
+                
+                if (available.length === 0) {
+                    // No processes ready, advance time to next arrival
+                    const nextArrival = processList
+                        .filter(p => p.remainingTime > 0)
+                        .reduce((min, p) => Math.min(min, p.arrivalTime), Infinity);
+                    
+                    if (nextArrival === Infinity) break;
+                    
+                    currentTime = nextArrival;
+                    continue;
+                }
+                
+                // Find process with shortest burst time (or remaining time if preemptive)
+                available.sort((a, b) => {
+                    if (preemptive) {
+                        return a.remainingTime - b.remainingTime;
+                    } else {
+                        return a.burstTime - b.burstTime;
+                    }
+                });
+                
+                const currentProcess = available[0];
+                let executionTime;
+                
+                if (preemptive) {
+                    // Execute until completion or new process arrives with shorter time
+                    executionTime = currentProcess.remainingTime;
+                    
+                    // Check if a new process arrives with shorter remaining time
+                    const nextArrival = processList
+                        .filter(p => p.arrivalTime > currentTime && p.remainingTime > 0)
+                        .reduce((min, p) => Math.min(min, p.arrivalTime), Infinity);
+                    
+                    if (nextArrival < currentTime + currentProcess.remainingTime) {
+                        // Check if arriving process has shorter remaining time
+                        const arrivingProcesses = processList.filter(p => 
+                            p.arrivalTime === nextArrival && 
+                            p.remainingTime > 0 && 
+                            p.remainingTime < currentProcess.remainingTime - (nextArrival - currentTime));
+                        
+                        if (arrivingProcesses.length > 0) {
+                            executionTime = nextArrival - currentTime;
+                        }
+                    }
+                } else {
+                    executionTime = currentProcess.remainingTime;
+                }
+                
+                // Record execution in timeline
+                timeline.push({
+                    process: currentProcess.id,
+                    start: currentTime,
+                    end: currentTime + executionTime
+                });
+                
+                currentTime += executionTime;
+                currentProcess.remainingTime -= executionTime;
+                
+                if (currentProcess.remainingTime === 0) {
+                    currentProcess.finishTime = currentTime;
+                    remainingProcesses--;
+                }
+            }
+            
+            return timeline;
+        }
+        
+        function calculateMetrics(processes, timeline) {
+            // Calculate finish time for each process
+            for (let process of processes) {
+                if (!process.finishTime) {
+                    const lastExecution = timeline
+                        .filter(t => t.process === process.id)
+                        .reduce((last, curr) => curr.end > last.end ? curr : last, {end: 0});
+                    
+                    process.finishTime = lastExecution.end;
+                }
+                
+                // Calculate turnaround and waiting time
+                process.turnaroundTime = process.finishTime - process.arrivalTime;
+                process.waitingTime = process.turnaroundTime - process.burstTime;
+            }
+        }
+        
+        function displayResults(processes, timeline, algorithm, quantum) {
+            const outputDiv = document.getElementById('output');
+            outputDiv.style.display = 'block';
+            
+            // Set algorithm name
+            let algorithmName = '';
+            switch(algorithm) {
+                case 'fifo': algorithmName = 'FIFO (First In First Out)'; break;
+                case 'lifo': algorithmName = 'LIFO (Last In First Out)'; break;
+                case 'rr': algorithmName = `Round Robin (Quantum = ${quantum})`; break;
+                case 'sjf': algorithmName = 'SJF (Shortest Job First) Non-preemptive'; break;
+                case 'sjf-p': algorithmName = 'SRF (Shortest Remaining First)'; break;
+            }
+            document.getElementById('algorithm-name').innerHTML = `<h3>Algoritma: ${algorithmName}</h3>`;
+            
+            // Display Gantt chart
+            const ganttChart = document.getElementById('gantt-chart');
+            ganttChart.innerHTML = '';
+            
+            const timeMarkers = document.createElement('div');
+            timeMarkers.className = 'time-marker';
+            
+            for (let event of timeline) {
+                const duration = event.end - event.start;
+                const box = document.createElement('div');
+                box.className = 'gantt-box';
+                box.textContent = `P${event.process}`;
+                box.style.flex = duration;
+                ganttChart.appendChild(box);
+                
+                // Add start time marker
+                if (event === timeline[0]) {
+                    const startMarker = document.createElement('div');
+                    startMarker.textContent = event.start;
+                    timeMarkers.appendChild(startMarker);
+                }
+                
+                // Add end time marker
+                const endMarker = document.createElement('div');
+                endMarker.textContent = event.end;
+                timeMarkers.appendChild(endMarker);
+            }
+            
+            ganttChart.appendChild(timeMarkers);
+            
+            // Display process table
+            const tableBody = document.getElementById('process-table-body');
+            tableBody.innerHTML = '';
+            
+            for (let process of processes) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>P${process.id}</td>
+                    <td>${process.arrivalTime}</td>
+                    <td>${process.burstTime}</td>
+                    <td>${process.finishTime}</td>
+                    <td>${process.turnaroundTime}</td>
+                    <td>${process.waitingTime}</td>
+                `;
+                tableBody.appendChild(row);
+            }
+            
+            // Calculate averages
+            const avgWaiting = processes.reduce((sum, p) => sum + p.waitingTime, 0) / processes.length;
+            const avgTurnaround = processes.reduce((sum, p) => sum + p.turnaroundTime, 0) / processes.length;
+            
+            document.getElementById('metrics').innerHTML = `
+                <p><strong>Rata-rata Waktu Tunggu:</strong> ${avgWaiting.toFixed(2)}</p>
+                <p><strong>Rata-rata Turnaround Time:</strong> ${avgTurnaround.toFixed(2)}</p>
+            `;
+            
+            // Scroll to results
+            outputDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
